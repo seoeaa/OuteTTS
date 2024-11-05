@@ -29,7 +29,7 @@ class AudioCodec:
 
     def get_cache_dir(self):
         return os.path.join(
-            os.getenv('APPDATA') if platform.system() == "Windows" else os.path.join(os.path.expanduser("~"), ".cache"), 
+            os.getenv('APPDATA') if platform.system() == "Windows" else os.path.join(os.path.expanduser("~"), ".cache"),
             "outeai", "tts", "wavtokenizer_large_speech_75_token")
 
     def ensure_model_exists(self):
@@ -52,15 +52,17 @@ class AudioCodec:
                 size = file.write(data)
                 bar.update(size)
 
+    def convert_audio_tensor(self, audio: torch.Tensor, sr):
+        return convert_audio(audio, sr, self.sr, 1)
+
     def load_audio(self, path):
         wav, sr = torchaudio.load(path)
-        wav = convert_audio(wav, sr, self.sr, 1) 
-        return wav.to(self.device)
+        return self.convert_audio_tensor(wav, sr).to(self.device)
 
     def encode(self, audio: torch.Tensor):
         _,discrete_code= self.wavtokenizer.encode_infer(audio, bandwidth_id=torch.tensor([0]).to(self.device))
         return discrete_code
-        
+
     def decode(self, codes):
         features = self.wavtokenizer.codes_to_features(codes)
         audio_out = self.wavtokenizer.decode(features, bandwidth_id=torch.tensor([0]).to(self.device))

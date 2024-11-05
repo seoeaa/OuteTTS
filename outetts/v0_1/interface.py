@@ -7,6 +7,7 @@ from .alignment import CTCForcedAlignment
 import torchaudio
 import tempfile
 from dataclasses import dataclass
+import pickle
 
 @dataclass
 class ModelOutput:
@@ -29,8 +30,8 @@ class InterfaceHF:
         additional_model_config: dict = {}
     ) -> None:
         self.device = torch.device(
-            device if device is not None 
-            else "cuda" if torch.cuda.is_available() 
+            device if device is not None
+            else "cuda" if torch.cuda.is_available()
             else "cpu"
         )
         self.audio_codec = AudioCodec(self.device)
@@ -53,15 +54,15 @@ class InterfaceHF:
         words = ctc.align(audio_path, transcript)
         ctc.free()
 
-        full_audio = torch.cat([i["audio"] for i in words], dim=1)
-
-        with tempfile.NamedTemporaryFile(suffix=".wav") as temp_file:
-            torchaudio.save(temp_file.name, full_audio, ctc.sample_rate)
-            full_codes = self.audio_codec.encode(self.audio_codec.load_audio(temp_file.name)).tolist()
+        full_codes = self.audio_codec.encode(
+            self.audio_codec.convert_audio_tensor(
+                audio=torch.cat([i["audio"] for i in words], dim=1),
+                sr=ctc.sample_rate
+            ).to(self.audio_codec.device)
+        ).tolist()
 
         data = []
         start = 0
-
         for i in words:
             end = int(round((i["x1"] / ctc.sample_rate) * 75))
             word_tokens = full_codes[0][0][start:end]
@@ -69,11 +70,9 @@ class InterfaceHF:
             if not word_tokens:
                 word_tokens = [1]
 
-            duration = round(len(word_tokens) / 75, 2)
-
             data.append({
                 "word": i["word"],
-                "duration": duration,
+                "duration": round(len(word_tokens) / 75, 2),
                 "codes": word_tokens
             })
 
@@ -81,7 +80,15 @@ class InterfaceHF:
             "text": transcript,
             "words": data,
         }
-    
+
+    def save_speaker(self, speaker: dict, path: str):
+        with open(path, "wb") as f:
+            pickle.dump(speaker, f)
+
+    def load_speaker(self, path: str):
+        with open(path, "rb") as f:
+            return pickle.load(f)
+
     def generate(self, text: str, speaker: dict = None, temperature: float = 0.1, repetition_penalty: float = 1.1, max_lenght: int = 4096) -> ModelOutput:
         input_ids = self.prepare_prompt(text, speaker)
         output = self.model.generate(
@@ -104,8 +111,8 @@ class InterfaceGGUF(InterfaceHF):
             additional_model_config: dict = {}
     ) -> None:
         self.device = torch.device(
-            device if device is not None 
-            else "cuda" if torch.cuda.is_available() 
+            device if device is not None
+            else "cuda" if torch.cuda.is_available()
             else "cpu"
         )
         self.audio_codec = AudioCodec(self.device)
@@ -132,4 +139,3 @@ class InterfaceGGUF(InterfaceHF):
         )
         audio = self.get_audio(output)
         return ModelOutput(audio, self.audio_codec.sr)
-        

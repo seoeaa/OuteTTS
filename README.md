@@ -50,6 +50,12 @@ speaker = interface.create_speaker(
     "reference text matching the audio"
 )
 
+# Save the speaker to a file
+interface.save_speaker(speaker, "speaker.pkl")
+
+# Load the speaker from a file
+speaker = interface.load_speaker("speaker.pkl")
+
 # Generate TTS with the custom voice
 output = interface.generate(
     text="This is a cloned voice speaking",
