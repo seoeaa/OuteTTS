@@ -220,7 +220,7 @@ class ArithmeticDecoder:
 
         Args:
             quantized_cdf (torch.Tensor): use `build_stable_quantized_cdf`
-                to build this from your pdf estimate. This must be **exatly**
+                to build this from your pdf estimate. This must be **exactly**
                 the same cdf as the one used at encoding time.
         """
         while self.delta < 2 ** self.total_range_bits:
