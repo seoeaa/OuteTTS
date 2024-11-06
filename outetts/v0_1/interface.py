@@ -89,14 +89,14 @@ class InterfaceHF:
         with open(path, "rb") as f:
             return pickle.load(f)
 
-    def generate(self, text: str, speaker: dict = None, temperature: float = 0.1, repetition_penalty: float = 1.1, max_lenght: int = 4096) -> ModelOutput:
+    def generate(self, text: str, speaker: dict = None, temperature: float = 0.1, repetition_penalty: float = 1.1, max_length: int = 4096) -> ModelOutput:
         input_ids = self.prepare_prompt(text, speaker)
         output = self.model.generate(
             input_ids=input_ids,
             config=GenerationConfig(
                 temperature=temperature,
                 repetition_penalty=repetition_penalty,
-                max_length=max_lenght
+                max_length=max_length
             )
         )
         audio = self.get_audio(output[input_ids.size()[-1]:])
@@ -128,13 +128,13 @@ class InterfaceGGUF(InterfaceHF):
         return self.prompt_processor.tokenizer.encode(
             prompt, add_special_tokens=False)
 
-    def generate(self, text: str, speaker: dict = None, temperature: float = 0.1, repetition_penalty: float = 1.1, max_lenght: int = 4096) -> ModelOutput:
+    def generate(self, text: str, speaker: dict = None, temperature: float = 0.1, repetition_penalty: float = 1.1, max_length: int = 4096) -> ModelOutput:
         output = self.model.generate(
             input_ids=self.prepare_prompt(text, speaker),
             config=GenerationConfig(
                 temperature=temperature,
                 repetition_penalty=repetition_penalty,
-                max_length=max_lenght
+                max_length=max_length
             )
         )
         audio = self.get_audio(output)

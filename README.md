@@ -32,7 +32,7 @@ output = interface.generate(
     text="Hello, am I working?",
     temperature=0.1,
     repetition_penalty=1.1,
-    max_lenght=4096
+    max_length=4096
 )
 
 # Play the generated audio
@@ -62,7 +62,7 @@ output = interface.generate(
     speaker=speaker,
     temperature=0.1,
     repetition_penalty=1.1,
-    max_lenght=4096
+    max_length=4096
 )
 ```
 

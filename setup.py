@@ -8,14 +8,14 @@ with open('requirements.txt', 'r', encoding='utf-8') as fh:
 
 setup(
     name='outetts',
-    version='0.1.6',
+    version='0.1.7',
     packages=find_packages(),
     install_requires=install_requires,
     author='OuteAI',
     description='OuteAI Text-to-Speech (TTS)',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/OuteAI/OuteTTS',
+    url='https://github.com/edwko/OuteTTS',
     package_data={
         "outetts.v0_1": ["wavtokenizer_config.yaml"],
     },
