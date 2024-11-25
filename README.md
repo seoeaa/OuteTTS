@@ -79,6 +79,22 @@ model_config = outetts.GGUFModelConfig_v1(
 interface = outetts.InterfaceGGUF(model_version="0.2", cfg=model_config)
 ```
 
+# Configure the model with bfloat16 and flash attention
+
+```python
+import outetts
+import torch
+
+model_config = outetts.HFModelConfig_v1(
+    model_path="OuteAI/OuteTTS-0.2-500M",
+    language="en",  # Supported languages in v0.2: en, zh, ja, ko
+    dtype=torch.bfloat16,
+    additional_model_config={
+        'attn_implementation': "flash_attention_2"
+    }
+)
+```
+
 ### Creating a Speaker for Voice Cloning
 
 To achieve the best results when creating a speaker profile, consider the following recommendations:
