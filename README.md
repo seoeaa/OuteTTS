@@ -1,7 +1,7 @@
 # OuteTTS
 
-[![HuggingFace](https://img.shields.io/badge/🤗%20Hugging%20Face-OuteTTS_0.2_500M-blue)](https://huggingface.co/OuteAI/OuteTTS-0.1-350M)
-[![HuggingFace](https://img.shields.io/badge/🤗%20Hugging%20Face-OuteTTS_0.2_500M_GGUF-blue)](https://huggingface.co/OuteAI/OuteTTS-0.1-350M-GGUF)
+[![HuggingFace](https://img.shields.io/badge/🤗%20Hugging%20Face-OuteTTS_0.2_500M-blue)](https://huggingface.co/OuteAI/OuteTTS-0.2-500M)
+[![HuggingFace](https://img.shields.io/badge/🤗%20Hugging%20Face-OuteTTS_0.2_500M_GGUF-blue)](https://huggingface.co/OuteAI/OuteTTS-0.2-500M-GGUF)
 [![HuggingFace](https://img.shields.io/badge/🤗%20Hugging%20Face-Demo_Space-pink)](https://huggingface.co/spaces/OuteAI/OuteTTS-0.2-500M-Demo)
 [![PyPI](https://img.shields.io/badge/PyPI-OuteTTS-orange)](https://pypi.org/project/outetts/)
 
@@ -79,7 +79,7 @@ model_config = outetts.GGUFModelConfig_v1(
 interface = outetts.InterfaceGGUF(model_version="0.2", cfg=model_config)
 ```
 
-# Configure the model with bfloat16 and flash attention
+### Configure the model with bfloat16 and flash attention
 
 ```python
 import outetts
