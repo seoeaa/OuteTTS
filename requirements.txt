@@ -20,3 +20,6 @@ natsort
 tqdm
 requests
 sounddevice
+mecab-python3
+unidic-lite
+uroman
