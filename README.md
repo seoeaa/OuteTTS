@@ -117,10 +117,9 @@ To achieve the best results when creating a speaker profile, consider the follow
    - Adjust parameters like `temperature` in the `generate` function to refine the expressive quality and consistency of the synthesized voice.
 
 ## Blogs
-https://www.outeai.com/blog/OuteTTS-0.2-500M
+https://www.outeai.com/blog/outetts-0.2-500m
 
-https://www.outeai.com/blog/OuteTTS-0.1-350M
-
+https://www.outeai.com/blog/outetts-0.1-350m
 
 ## Credits
 
