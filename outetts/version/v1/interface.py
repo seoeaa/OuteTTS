@@ -49,6 +49,10 @@ _DEFAULT_SPEAKERS = {
     "zh": {
         "male_1": get_speaker_path("zh_male_1"),
         "female_1": get_speaker_path("zh_female_1"),
+    },
+    "ru": {
+        "male_1": get_speaker_path("ru_male_1"),
+        "female_1": get_speaker_path("ru_female_1"),
     }
 }
 
