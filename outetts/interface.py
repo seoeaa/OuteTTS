@@ -18,7 +18,7 @@ MODEL_CONFIGS = {
         "tokenizer": "OuteAI/OuteTTS-0.2-500M",
         "sizes": ["500M"],
         "links": ["https://huggingface.co/OuteAI/OuteTTS-0.2-500M", "https://huggingface.co/OuteAI/OuteTTS-0.2-500M-GGUF"],
-        "languages": ["en", "ja", "ko", "zh"],
+        "languages": ["en", "ja", "ko", "zh",  "ru"],
         "hf_interface": _InterfaceHF_v1,
         "gguf_interface": _InterfaceGGUF_v1,
     },

@@ -1,0 +1,24 @@
+# Основные зависимости
+torch>=2.0.0
+torchaudio>=2.0.0
+pytorch-lightning>=2.0.0
+transformers>=4.30.0
+loguru>=0.7.0
+
+# Для обработки данных
+datasets>=2.14.0
+tqdm>=4.65.0
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Для обработки текста
+num2words>=0.5.12
+transliterate>=1.10.2
+pypinyin>=0.49.0
+mecab-python3>=1.0.6
+inflect>=7.0.0
+uroman>=0.2.0
+
+# Для аудио
+sounddevice>=0.4.6
+librosa>=0.10.0

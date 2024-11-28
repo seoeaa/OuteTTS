@@ -1,30 +1,49 @@
 import os
 import gradio as gr
 import outetts
-from outetts.version.v1.interface import _DEFAULT_SPEAKERS
+from outetts.version.v1.interface import _DEFAULT_SPEAKERS, HFModelConfig
 
-model_config = outetts.HFModelConfig_v1(
+# Создаем конфигурацию с базовыми параметрами
+model_config = HFModelConfig(
     model_path="OuteAI/OuteTTS-0.2-500M",
-    language="en",
+    language="en",  # Начальный язык
+    additional_model_config={
+        "pad_token_id": 0
+    }
 )
-interface = outetts.InterfaceHF(model_version="0.2", cfg=model_config)
+
+# Создаем интерфейс
+interface = outetts.InterfaceHF(
+    model_version="0.2",
+    cfg=model_config
+)
 
 def get_available_speakers(language):
     """Get available speakers for the selected language."""
-    if language not in interface.languages:
-        return []
-    speakers = list(_DEFAULT_SPEAKERS[language].keys())
-    speakers.insert(0, "None") 
-    return speakers
+    language = language.lower()
+    if language in _DEFAULT_SPEAKERS:
+        return list(_DEFAULT_SPEAKERS[language].keys())
+    return ["None"]
 
 def change_interface_language(language):
     """Change interface language and update available speakers."""
     try:
+        language = language.lower()
+        # Явно меняем язык интерфейса и модели
         interface.change_language(language)
         speakers = get_available_speakers(language)
-        return gr.update(choices=speakers, value="male_1"), gr.update(visible=True)
+        # Для русского языка явно проверяем наличие голосов
+        if language == "ru" and speakers:
+            print(f"Available Russian speakers: {speakers}")
+        return gr.update(choices=speakers, value=speakers[0] if speakers else "None"), gr.update(visible=True)
     except ValueError as e:
         return gr.update(choices=["None"], value="None"), gr.update(visible=False)
+
+def preprocess_russian_text(text):
+    """Предварительная обработка русского текста."""
+    # Удаляем лишние пробелы и переносы строк
+    text = " ".join(text.split())
+    return text
 
 def generate_tts(
         text, temperature, repetition_penalty, language, 
@@ -32,6 +51,15 @@ def generate_tts(
     ):
     """Generate TTS with error handling and new features."""
     try:
+        # Убеждаемся, что используется правильный язык
+        language = language.lower()
+        interface.change_language(language)
+        
+        # Предварительная обработка текста для русского языка
+        if language == "ru":
+            text = preprocess_russian_text(text)
+            print(f"Processing Russian text: {text}")
+        
         # Validate inputs for custom speaker
         if reference_audio and reference_text:
             if not os.path.exists(reference_audio):
@@ -42,7 +70,11 @@ def generate_tts(
 
         # Use selected default speaker
         elif speaker_selection and speaker_selection != "None":
+            # Загружаем голос с явным указанием языка
             speaker = interface.load_default_speaker(speaker_selection)
+            if isinstance(speaker, dict):
+                speaker["language"] = language
+                print(f"Using speaker: {speaker_selection} for language: {language}")
 
         # No speaker - random characteristics
         else:
@@ -67,6 +99,7 @@ def generate_tts(
         return output_path, None
 
     except Exception as e:
+        print(f"Error during generation: {str(e)}")
         return None, str(e)
 
 with gr.Blocks() as demo:
@@ -78,7 +111,7 @@ with gr.Blocks() as demo:
         with gr.Column():
             # Language selection
             language_dropdown = gr.Dropdown(
-                choices=list(interface.languages),
+                choices=["en", "ja", "ko", "zh", "ru"],
                 value="en",
                 label="Interface Language"
             )
@@ -133,12 +166,14 @@ with gr.Blocks() as demo:
                 type="filepath"
             )
 
+    # Обработчик изменения языка
     language_dropdown.change(
         fn=change_interface_language,
         inputs=[language_dropdown],
         outputs=[speaker_dropdown, speaker_dropdown]
     )
 
+    # Обработчик генерации речи
     submit_button.click(
         fn=generate_tts,
         inputs=[

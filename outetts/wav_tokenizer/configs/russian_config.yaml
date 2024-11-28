@@ -1,0 +1,84 @@
+seed_everything: 3407
+
+data:
+  class_path: outetts.wav_tokenizer.decoder.dataset.VocosDataModule
+  init_args:
+    train_params:
+      filelist_path: ./data/russian_common_voice/filelist.txt
+      sampling_rate: 24000
+      num_samples: 72000
+      batch_size: 32
+      num_workers: 8
+
+    val_params:
+      filelist_path: ./data/russian_common_voice/filelist_val.txt
+      sampling_rate: 24000
+      num_samples: 72000
+      batch_size: 4
+      num_workers: 8
+
+model:
+  class_path: outetts.wav_tokenizer.decoder.experiment.WavTokenizer
+  init_args:
+    sample_rate: 24000
+    initial_learning_rate: 2e-4
+    mel_loss_coeff: 45
+    mrd_loss_coeff: 1.0
+    num_warmup_steps: 1000
+    pretrain_mel_steps: 10000
+
+    evaluate_utmos: true
+    evaluate_pesq: true
+    evaluate_periodicty: true
+
+    feature_extractor:
+      class_path: outetts.wav_tokenizer.decoder.feature_extractors.EncodecFeatures
+      init_args:
+        encodec_model: encodec_24khz
+        bandwidths: [6.6, 6.6, 6.6, 6.6]
+        train_codebooks: true
+        num_quantizers: 2
+        dowmsamples: [8, 5, 4, 2]
+        vq_bins: 8192
+        vq_kmeans: 400
+
+    backbone:
+      class_path: outetts.wav_tokenizer.decoder.models.VocosBackbone
+      init_args:
+        input_channels: 512
+        dim: 1024
+        intermediate_dim: 3072
+        num_layers: 16
+        adanorm_num_embeddings: 8
+
+    head:
+      class_path: outetts.wav_tokenizer.decoder.heads.ISTFTHead
+      init_args:
+        dim: 1024
+        n_fft: 1280 
+        hop_length: 320  
+        padding: same
+
+trainer:
+    class_path: pytorch_lightning.loggers.TensorBoardLogger
+    init_args:
+      save_dir: ./result/train/russian_wavtokenizer/
+  callbacks:
+    - class_path: pytorch_lightning.callbacks.LearningRateMonitor
+    - class_path: pytorch_lightning.callbacks.ModelSummary
+      init_args:
+        max_depth: 2
+    - class_path: pytorch_lightning.callbacks.ModelCheckpoint
+      init_args:
+        monitor: val_loss
+        filename: russian_wavtokenizer_{epoch}_{step}_{val_loss:.4f}
+        save_top_k: 10
+        save_last: true
+    - class_path: decoder.helpers.GradNormCallback
+
+  max_steps: 1000000
+  limit_val_batches: 100
+  accelerator: gpu
+  strategy: ddp
+  devices: [0]
+  log_every_n_steps: 100

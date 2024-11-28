@@ -171,11 +171,11 @@ class InterfaceHF:
         }
 
     def save_speaker(self, speaker: dict, path: str):
-        with open(path, "w") as f:
-            json.dump(speaker, f, indent=2)
+        with open(path, "w", encoding='utf-8') as f:
+            json.dump(speaker, f, indent=2, ensure_ascii=False)
 
     def load_speaker(self, path: str):
-        with open(path, "r") as f:
+        with open(path, "r", encoding='utf-8') as f:
             return json.load(f)
         
     def print_default_speakers(self):
